@@ -1,0 +1,18 @@
+﻿@page "/appsettings"
+@inject IConfiguration Configuration
+
+<PageTitle>App settings</PageTitle>
+
+<h1>App settings</h1>
+
+<p role="status">Current Azure Container Instance name: @currentAppSettingsEnvironmentName</p>
+
+@code {
+    private string currentAppSettingsEnvironmentName = "Not yet initialized";
+    
+    protected override void OnInitialized()
+    {
+        currentAppSettingsEnvironmentName = Configuration["EnvironmentSettings:Name"] ?? "Empty";
+    }
+
+}
