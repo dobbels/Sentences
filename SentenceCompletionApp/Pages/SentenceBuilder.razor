@@ -1,34 +1,45 @@
 ﻿@page "/"
 @page "/sentence-completion"
+@using SentenceCompletionApp.Data
+@inject SentenceStemService SentenceStemService
 
 <PageTitle>Sentence Completion</PageTitle>
 
-
 <h3>Sentence Completion</h3>
 
-<p>@currentStem</p>
-<input @bind="sentenceEnding" @bind:event="oninput" maxlength="5000" />
-<button @onclick="SubmitSentence">Submit</button>
+<div style="display: flex;">
+    <div style="display:flex; align-items: center; padding-right: 1rem;">
+        @nextSentenceStem?.Text
+    </div>
+    <form name="sentenceEnding" @onsubmit="SubmitSentence">
+        <input
+            type="text"
+            @bind="sentenceEnding"
+            maxlength="5000"
+            placeholder="Schrijf hier het allereerste wat in je opkomt..." />
+        <input type="submit" hidden />
+    </form>
+</div>
 
 @code {
-    private string[] sentenceStems = new string[] {
-        "Today is a great day because...",
-        "The best way to start the day is...",
-        "I feel happiest when..."
-    // Add more sentence stems here
-    };
-    private string currentStem;
-    private string sentenceEnding;
+    private SentenceStem? nextSentenceStem;
+    private string sentenceEnding = "";
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        Random random = new Random();
-        currentStem = sentenceStems[random.Next(sentenceStems.Length)];
+        await LoadNextSentenceStem();
     }
 
-    private void SubmitSentence()
+    private async Task SubmitSentence()
     {
-        string fullSentence = currentStem + sentenceEnding;
-        // Code to send fullSentence to the backend
+        var fullSentence = new SentenceSubmission(nextSentenceStem, sentenceEnding);
+        await SentenceStemService.PersistUserInputAsync(fullSentence);
+        await LoadNextSentenceStem();
+    }
+
+    private async Task LoadNextSentenceStem()
+    {
+        nextSentenceStem = await SentenceStemService.GetNextSentenceStemAsync();
+        sentenceEnding = "";
     }
 }
