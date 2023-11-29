@@ -1,0 +1,34 @@
+﻿@page "/"
+@page "/sentence-completion"
+
+<PageTitle>Sentence Completion</PageTitle>
+
+
+<h3>Sentence Completion</h3>
+
+<p>@currentStem</p>
+<input @bind="sentenceEnding" @bind:event="oninput" maxlength="5000" />
+<button @onclick="SubmitSentence">Submit</button>
+
+@code {
+    private string[] sentenceStems = new string[] {
+        "Today is a great day because...",
+        "The best way to start the day is...",
+        "I feel happiest when..."
+    // Add more sentence stems here
+    };
+    private string currentStem;
+    private string sentenceEnding;
+
+    protected override void OnInitialized()
+    {
+        Random random = new Random();
+        currentStem = sentenceStems[random.Next(sentenceStems.Length)];
+    }
+
+    private void SubmitSentence()
+    {
+        string fullSentence = currentStem + sentenceEnding;
+        // Code to send fullSentence to the backend
+    }
+}
