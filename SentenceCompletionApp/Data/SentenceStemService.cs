@@ -5,19 +5,25 @@ namespace SentenceCompletionApp.Data;
 
 public class SentenceStemService
 {
-    private readonly string _endpointUri;
-    private readonly string _primaryKey;
     private readonly CosmosClient _cosmosClient;
     private Database? _database;
     private Container? _container;
-    private readonly string _databaseId = "ThoughtOutput";
+    private readonly string _databaseId = "ThoughtOutput-Test";
     private readonly string _containerId = "Sentences";
+    private readonly IConfiguration _configuration;
 
     public SentenceStemService(IConfiguration configuration)
     {
-        _endpointUri = configuration["CosmosDb:EndpointUri"] ?? "Empty endpoint URI";
-        _primaryKey = configuration["CosmosDb:PrimaryKey"] ?? "Empty primary key";
-        _cosmosClient = new CosmosClient(_endpointUri, _primaryKey, new CosmosClientOptions() { ApplicationName = "SentenceCompletionApp" });
+        var endpointUri = configuration["CosmosDb:EndpointUri"] ?? "Empty endpoint URI";
+        var primaryKey = configuration["CosmosDb:PrimaryKey"] ?? "Empty primary key";
+        _cosmosClient = new CosmosClient(endpointUri, primaryKey, new CosmosClientOptions() { ApplicationName = "SentenceCompletionApp" });
+        _configuration = configuration;
+    }
+
+    public async Task InitializeAsync()
+    {
+        _database = await _cosmosClient.CreateDatabaseIfNotExistsAsync(_configuration["CosmosDb:DatabaseId"] ?? "EmptyDatabaseId");
+        _container = await _database.CreateContainerIfNotExistsAsync(_configuration["CosmosDb:ContainerId"] ?? "EmptyContainerId", $"/{nameof(SentenceSubmission.SentenceStemText)}");
     }
 
     private string[] sentenceStems = new string[] {
@@ -35,29 +41,8 @@ public class SentenceStemService
 
     public async Task PersistFormedSentenceAsync(SentenceSubmissionDto sentenceSubmissionDto)
     {
-        await CreateDatabaseAsync();
-        await CreateContainerAsync();
-
         var sentenceSubmission = new SentenceSubmission(sentenceSubmissionDto);
         await AddToContainerAsync(sentenceSubmission);
-    }
-
-    private async Task CreateDatabaseAsync()
-    {
-        if (_database == null)
-        {
-            _database = await _cosmosClient.CreateDatabaseIfNotExistsAsync(_databaseId);
-            Console.WriteLine("Created Database: {0}\n", _database.Id);
-        }
-    }
-
-    private async Task CreateContainerAsync()
-    {
-        if (_container == null && _database != null)
-        {
-            _container = await _database.CreateContainerIfNotExistsAsync(_containerId, $"/{nameof(SentenceSubmission.SentenceStemText)}");
-            Console.WriteLine("Created Container: {0}\n", _container.Id);
-        }
     }
 
     private async Task AddToContainerAsync(SentenceSubmission sentenceSubmission)
