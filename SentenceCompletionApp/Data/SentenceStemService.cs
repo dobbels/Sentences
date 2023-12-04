@@ -8,8 +8,8 @@ public class SentenceStemService
     private readonly string _endpointUri;
     private readonly string _primaryKey;
     private CosmosClient _cosmosClient;
-    private Database _database;
-    private Container _container;
+    private Database? _database;
+    private Container? _container;
     private string _databaseId = "ThoughtOutput";
     private string _containerId = "Sentences";
 
@@ -40,20 +40,24 @@ public class SentenceStemService
 
         var sentenceSubmission = new SentenceSubmission(sentenceSubmissionDto);
         await AddToContainerAsync(sentenceSubmission);
-
-        //var blobName = $"{sentenceSubmission.SentenceStem.Text.GetHashCode()}"; Dit was een goed idee. En ik ga het ten minste 1 commit laten staan als applaus aan mezelf, of gewoon om te onthouden ofzo. 
     }
 
     private async Task CreateDatabaseAsync()
     {
-        _database = await _cosmosClient.CreateDatabaseIfNotExistsAsync(_databaseId);
-        Console.WriteLine("Created Database: {0}\n", _database.Id);
+        if (_database == null)
+        {
+            _database = await _cosmosClient.CreateDatabaseIfNotExistsAsync(_databaseId);
+            Console.WriteLine("Created Database: {0}\n", _database.Id);
+        }
     }
 
     private async Task CreateContainerAsync()
     {
-        _container = await _database.CreateContainerIfNotExistsAsync(_containerId, $"/{nameof(SentenceSubmission.SentenceStemText)}");
-        Console.WriteLine("Created Container: {0}\n", _container.Id);
+        if (_container == null)
+        {
+            _container = await _database.CreateContainerIfNotExistsAsync(_containerId, $"/{nameof(SentenceSubmission.SentenceStemText)}");
+            Console.WriteLine("Created Container: {0}\n", _container.Id);
+        }
     }
 
     private async Task AddToContainerAsync(SentenceSubmission sentenceSubmission)
