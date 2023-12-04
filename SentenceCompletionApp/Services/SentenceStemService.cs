@@ -1,6 +1,5 @@
 ﻿using Microsoft.Azure.Cosmos;
 using SentenceCompletionApp.Model;
-using System.Net;
 
 namespace SentenceCompletionApp.Services;
 
