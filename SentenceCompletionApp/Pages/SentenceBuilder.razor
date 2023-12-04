@@ -16,7 +16,8 @@
             type="text"
             @bind="sentenceEnding"
             maxlength="5000"
-            placeholder="Schrijf hier het allereerste wat in je opkomt..." />
+            placeholder="Schrijf hier het allereerste wat in je opkomt..."
+            required="required" pattern=".+" />
         <input type="submit" hidden />
     </form>
 </div>
@@ -32,7 +33,7 @@
 
     private async Task SubmitSentence()
     {
-        var fullSentence = new SentenceSubmission(nextSentenceStem, sentenceEnding);
+        var fullSentence = new SentenceSubmissionDto(nextSentenceStem, sentenceEnding);
         await SentenceStemService.PersistUserInputAsync(fullSentence);
         await LoadNextSentenceStem();
     }
@@ -42,4 +43,6 @@
         nextSentenceStem = await SentenceStemService.GetNextSentenceStemAsync();
         sentenceEnding = "";
     }
+
+
 }

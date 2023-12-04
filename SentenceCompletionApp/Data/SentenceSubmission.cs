@@ -1,15 +1,36 @@
-﻿namespace SentenceCompletionApp.Data
-{
-    public class SentenceSubmission
-    {
-        public SentenceStem SentenceStem { get; set; }
+﻿using Newtonsoft.Json;
 
-        public SentenceSubmission(SentenceStem sentenceStem, string ending)
+namespace SentenceCompletionApp.Data;
+
+public class SentenceSubmission
+{
+    // Is used by the cosmos library to construct response of type ItemResponse<SentenceSubmission>
+    public SentenceSubmission()
+    {
+    }
+    
+    public SentenceSubmission(SentenceSubmissionDto sentenceSubmissionDto)
+    {
+        if (sentenceSubmissionDto == null)
         {
-            SentenceStem = sentenceStem;
-            Ending = ending;
+            throw new ArgumentNullException(nameof(sentenceSubmissionDto));
         }
 
-        public string Ending { get; set; }
+        Id = Guid.NewGuid().ToString();
+        SentenceStem = sentenceSubmissionDto.SentenceStem;
+        SentenceStemText = sentenceSubmissionDto.SentenceStem.Text;
+        Ending = sentenceSubmissionDto.Ending;
+        DateOfSubmission = DateTime.UtcNow;
     }
+
+    [JsonProperty(PropertyName = "id")]
+    public string Id { get; }
+    
+    public SentenceStem SentenceStem { get; }
+    
+    public string SentenceStemText { get; }
+    
+    public string Ending { get; }
+    
+    public DateTime DateOfSubmission { get; }
 }

@@ -1,24 +1,71 @@
-﻿namespace SentenceCompletionApp.Data
+﻿using Microsoft.Azure.Cosmos;
+using System.Net;
+
+namespace SentenceCompletionApp.Data;
+
+public class SentenceStemService
 {
-    public class SentenceStemService
+    private readonly string _endpointUri;
+    private readonly string _primaryKey;
+    private CosmosClient _cosmosClient;
+    private Database _database;
+    private Container _container;
+    private string _databaseId = "ThoughtOutput";
+    private string _containerId = "Sentences";
+
+    public SentenceStemService(IConfiguration configuration)
     {
-        private string[] sentenceStems = new string[] {
-            "Today is a great day because...",
-            "The best way to start the day is...",
-            "I feel happiest when..."
-        };
+        _endpointUri = configuration["CosmosDb:EndpointUri"] ?? "Empty endpoint URI";
+        _primaryKey = configuration["CosmosDb:PrimaryKey"] ?? "Empty primary key";
+        _cosmosClient = new CosmosClient(_endpointUri, _primaryKey, new CosmosClientOptions() { ApplicationName = "SentenceCompletionApp" });
+    }
 
-        public Task<SentenceStem> GetNextSentenceStemAsync()
+    private string[] sentenceStems = new string[] {
+        "Today is a great day because...",
+        "The best way to start the day is...",
+        "I feel happiest when..."
+    };
+
+    public Task<SentenceStem> GetNextSentenceStemAsync()
+    {
+        var random = new Random();
+        var currentStem = sentenceStems[random.Next(sentenceStems.Length)];
+        return Task.FromResult(new SentenceStem(currentStem));
+    }
+
+    public async Task PersistUserInputAsync(SentenceSubmissionDto sentenceSubmissionDto)
+    {
+        await CreateDatabaseAsync();
+        await CreateContainerAsync();
+
+        var sentenceSubmission = new SentenceSubmission(sentenceSubmissionDto);
+        await AddToContainerAsync(sentenceSubmission);
+
+        //var blobName = $"{sentenceSubmission.SentenceStem.Text.GetHashCode()}"; Dit was een goed idee. En ik ga het ten minste 1 commit laten staan als applaus aan mezelf, of gewoon om te onthouden ofzo. 
+    }
+
+    private async Task CreateDatabaseAsync()
+    {
+        _database = await _cosmosClient.CreateDatabaseIfNotExistsAsync(_databaseId);
+        Console.WriteLine("Created Database: {0}\n", _database.Id);
+    }
+
+    private async Task CreateContainerAsync()
+    {
+        _container = await _database.CreateContainerIfNotExistsAsync(_containerId, $"/{nameof(SentenceSubmission.SentenceStemText)}");
+        Console.WriteLine("Created Container: {0}\n", _container.Id);
+    }
+
+    private async Task AddToContainerAsync(SentenceSubmission sentenceSubmission)
+    {
+        try
         {
-            var random = new Random();
-            var currentStem = sentenceStems[random.Next(sentenceStems.Length)];
-            return Task.FromResult(new SentenceStem(currentStem));
+            var sentenceSubmissionResponse = await _container.ReadItemAsync<SentenceSubmission>(sentenceSubmission.Id, new PartitionKey(sentenceSubmission.SentenceStemText));
+            Console.WriteLine("Item in database with id: {0} already exists\n", sentenceSubmissionResponse.Resource.Id);
         }
-
-        public Task PersistUserInputAsync(SentenceSubmission input)
+        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
         {
-            Console.WriteLine(input.SentenceStem.Text + " - " + input.Ending);
-            return Task.FromResult("");
+            await _container.CreateItemAsync(sentenceSubmission, new PartitionKey(sentenceSubmission.SentenceStemText));
         }
     }
 }
