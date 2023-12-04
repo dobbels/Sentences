@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.Cosmos;
+using SentenceCompletionApp.Data;
 using SentenceCompletionApp.Model;
 
 namespace SentenceCompletionApp.Services;
@@ -25,17 +26,10 @@ public class SentenceStemService
         _container = await _database.CreateContainerIfNotExistsAsync(_containerId, $"/{nameof(SentenceSubmission.SentenceStemText)}");
     }
 
-    private string[] sentenceStems = new string[] {
-        "Today is a great day because...",
-        "The best way to start the day is...",
-        "I feel happiest when..."
-    };
-
     public Task<SentenceStem> GetNextSentenceStemAsync()
     {
-        var random = new Random();
-        var currentStem = sentenceStems[random.Next(sentenceStems.Length)];
-        return Task.FromResult(new SentenceStem(currentStem));
+        var currentStem = PillarsOfSelfEsteem30DayProgram.GetRandomSentence();
+        return Task.FromResult(currentStem.SentenceStem);
     }
 
     public async Task PersistFormedSentenceAsync(SentenceSubmissionDto sentenceSubmissionDto)
