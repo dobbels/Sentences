@@ -1,14 +1,14 @@
 ﻿using Microsoft.Azure.Cosmos;
+using SentenceCompletionApp.Model;
 using System.Net;
 
-namespace SentenceCompletionApp.Data;
+namespace SentenceCompletionApp.Services;
 
 public class SentenceStemService
 {
     private readonly CosmosClient _cosmosClient;
     private Database? _database;
     private Container? _container;
-    private readonly string _databaseId = "ThoughtOutput-Test";
     private readonly string _containerId = "Sentences";
     private readonly IConfiguration _configuration;
 
@@ -23,7 +23,7 @@ public class SentenceStemService
     public async Task InitializeAsync()
     {
         _database = await _cosmosClient.CreateDatabaseIfNotExistsAsync(_configuration["CosmosDb:DatabaseId"] ?? "EmptyDatabaseId");
-        _container = await _database.CreateContainerIfNotExistsAsync(_configuration["CosmosDb:ContainerId"] ?? "EmptyContainerId", $"/{nameof(SentenceSubmission.SentenceStemText)}");
+        _container = await _database.CreateContainerIfNotExistsAsync(_containerId, $"/{nameof(SentenceSubmission.SentenceStemText)}");
     }
 
     private string[] sentenceStems = new string[] {

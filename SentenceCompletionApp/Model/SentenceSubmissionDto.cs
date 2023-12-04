@@ -1,4 +1,4 @@
-﻿namespace SentenceCompletionApp.Data;
+﻿namespace SentenceCompletionApp.Model;
 
 public class SentenceSubmissionDto
 {

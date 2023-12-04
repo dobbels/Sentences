@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace SentenceCompletionApp.Data;
+namespace SentenceCompletionApp.Model;
 
 public class SentenceSubmission
 {
@@ -8,7 +8,7 @@ public class SentenceSubmission
     public SentenceSubmission()
     {
     }
-    
+
     public SentenceSubmission(SentenceSubmissionDto sentenceSubmissionDto)
     {
         if (sentenceSubmissionDto == null)
@@ -25,12 +25,12 @@ public class SentenceSubmission
 
     [JsonProperty(PropertyName = "id")]
     public string Id { get; }
-    
+
     public SentenceStem SentenceStem { get; }
-    
+
     public string SentenceStemText { get; }
-    
+
     public string Ending { get; }
-    
+
     public DateTime DateOfSubmission { get; }
 }

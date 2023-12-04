@@ -1,4 +1,4 @@
-using SentenceCompletionApp.Data;
+using SentenceCompletionApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
