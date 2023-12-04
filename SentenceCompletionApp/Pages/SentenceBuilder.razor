@@ -34,7 +34,7 @@
     private async Task SubmitSentence()
     {
         var fullSentence = new SentenceSubmissionDto(nextSentenceStem, sentenceEnding);
-        await SentenceStemService.PersistUserInputAsync(fullSentence);
+        await SentenceStemService.PersistFormedSentenceAsync(fullSentence);
         await LoadNextSentenceStem();
     }
 

@@ -7,11 +7,11 @@ public class SentenceStemService
 {
     private readonly string _endpointUri;
     private readonly string _primaryKey;
-    private CosmosClient _cosmosClient;
+    private readonly CosmosClient _cosmosClient;
     private Database? _database;
     private Container? _container;
-    private string _databaseId = "ThoughtOutput";
-    private string _containerId = "Sentences";
+    private readonly string _databaseId = "ThoughtOutput";
+    private readonly string _containerId = "Sentences";
 
     public SentenceStemService(IConfiguration configuration)
     {
@@ -33,7 +33,7 @@ public class SentenceStemService
         return Task.FromResult(new SentenceStem(currentStem));
     }
 
-    public async Task PersistUserInputAsync(SentenceSubmissionDto sentenceSubmissionDto)
+    public async Task PersistFormedSentenceAsync(SentenceSubmissionDto sentenceSubmissionDto)
     {
         await CreateDatabaseAsync();
         await CreateContainerAsync();
@@ -53,7 +53,7 @@ public class SentenceStemService
 
     private async Task CreateContainerAsync()
     {
-        if (_container == null)
+        if (_container == null && _database != null)
         {
             _container = await _database.CreateContainerIfNotExistsAsync(_containerId, $"/{nameof(SentenceSubmission.SentenceStemText)}");
             Console.WriteLine("Created Container: {0}\n", _container.Id);
@@ -62,6 +62,11 @@ public class SentenceStemService
 
     private async Task AddToContainerAsync(SentenceSubmission sentenceSubmission)
     {
+        if (_container == null)
+        {
+            throw new InvalidProgramException($"Container should have been initialized before calling the method {nameof(AddToContainerAsync)}");
+        }
+
         try
         {
             var sentenceSubmissionResponse = await _container.ReadItemAsync<SentenceSubmission>(sentenceSubmission.Id, new PartitionKey(sentenceSubmission.SentenceStemText));
