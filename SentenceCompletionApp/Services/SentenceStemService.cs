@@ -51,15 +51,7 @@ public class SentenceStemService
         {
             throw new InvalidProgramException($"Container should have been initialized before calling the method {nameof(AddToContainerAsync)}");
         }
-
-        try
-        {
-            var sentenceSubmissionResponse = await _container.ReadItemAsync<SentenceSubmission>(sentenceSubmission.Id, new PartitionKey(sentenceSubmission.SentenceStemText));
-            Console.WriteLine("Item in database with id: {0} already exists\n", sentenceSubmissionResponse.Resource.Id);
-        }
-        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
-        {
-            await _container.CreateItemAsync(sentenceSubmission, new PartitionKey(sentenceSubmission.SentenceStemText));
-        }
+        
+        await _container.CreateItemAsync(sentenceSubmission, new PartitionKey(sentenceSubmission.SentenceStemText));
     }
 }
