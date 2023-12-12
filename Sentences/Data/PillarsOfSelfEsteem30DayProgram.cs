@@ -1,6 +1,6 @@
-﻿using SentenceCompletionApp.Model;
+﻿using Sentences.Model;
 
-namespace SentenceCompletionApp.Data;
+namespace Sentences.Data;
 
 public class PillarsOfSelfEsteem30DayProgram
 {

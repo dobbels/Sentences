@@ -1,8 +1,8 @@
 ﻿using Microsoft.Azure.Cosmos;
-using SentenceCompletionApp.Data;
-using SentenceCompletionApp.Model;
+using Sentences.Data;
+using Sentences.Model;
 
-namespace SentenceCompletionApp.Services;
+namespace Sentences.Services;
 
 public class SentenceStemService
 {
@@ -47,13 +47,13 @@ public class SentenceStemService
         {
             throw new InvalidProgramException($"Container should have been initialized before calling the method {nameof(AddToContainerAsync)}");
         }
-        
+
         await _container.CreateItemAsync(sentenceSubmission, new PartitionKey(sentenceSubmission.SentenceStemText));
     }
 
     private class Balancer
     {
-        private int _count = 0;
+        private static int _count = 0;
         public enum SentenceType
         {
             SixPillarsProgram,

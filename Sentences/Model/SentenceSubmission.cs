@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace SentenceCompletionApp.Model;
+namespace Sentences.Model;
 
 public class SentenceSubmission
 {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Azure.Cosmos;
-using SentenceCompletionApp.Model;
+using Sentences.Model;
 
-namespace SentenceCompletionApp.Services;
+namespace Sentences.Services;
 
 public class NotesService
 {
@@ -39,7 +39,7 @@ public class NotesService
         }
 
         var noteSubmission = new NoteSubmission(note);
-        
+
         await _container.CreateItemAsync(noteSubmission, new PartitionKey(noteSubmission.MonthOfSubmission));
     }
 }

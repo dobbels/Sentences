@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using Newtonsoft.Json;
 
-namespace SentenceCompletionApp.Model
+namespace Sentences.Model
 {
     public class NoteSubmission
     {
@@ -12,7 +12,7 @@ namespace SentenceCompletionApp.Model
 
         public NoteSubmission(string content)
         {
-            Id = 
+            Id =
             Content = content;
             MomentOfSubmission = DateTime.UtcNow;
         }
