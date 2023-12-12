@@ -3,13 +3,13 @@
 @using SentenceCompletionApp.Services
 @inject NotesService NotesService
 
-<div class="take-space">
-    <textarea class="take-space notes"
+<div class="take-space notes">
+    <textarea class="take-space notes-text"
               @bind="notes"
               maxlength="80000"
               placeholder="Waar denk je aan?"
               required="required" pattern=".+" />
-    <button type="button" @onclick="SubmitNotes">Button</button>
+    <button class="oi oi-arrow-thick-right submit-button" type="button" @onclick="SubmitNotes"></button>
 </div>
 
 @code {
