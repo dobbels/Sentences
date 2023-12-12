@@ -1,0 +1,33 @@
+﻿@page "/notes"
+@using SentenceCompletionApp.Model
+@using SentenceCompletionApp.Services
+@inject NotesService NotesService
+
+<div class="take-space">
+    <textarea class="take-space notes"
+              @bind="notes"
+              maxlength="80000"
+              placeholder="Waar denk je aan?"
+              required="required" pattern=".+" />
+    <button type="button" @onclick="SubmitNotes">Button</button>
+</div>
+
+@code {
+    private string notes = "";
+
+    private async Task SubmitNotes()
+    {
+        if (!String.IsNullOrWhiteSpace(notes))
+        {
+            await NotesService.PersistNotesAsync(notes);
+            GetReadyForNextInput();
+        }
+    }
+
+    private void GetReadyForNextInput()
+    {
+        notes = "";
+    }
+
+
+}

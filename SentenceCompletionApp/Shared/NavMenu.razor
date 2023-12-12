@@ -2,7 +2,7 @@
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">SentenceCompletionApp</a>
+        <a class="navbar-brand" href="">Zinnen</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -13,7 +13,14 @@
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="sentence-completion" Match="NavLinkMatch.All">
-                <span class="oi oi-graph" aria-hidden="true"></span> Sentence completion @* Ander idee voor icon: oi-comment-square *@
+                <span class="oi oi-graph" aria-hidden="true"></span> Om aan te vullen
+            </NavLink>
+        </div>
+    </nav>
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="notes" Match="NavLinkMatch.All">
+                <span class="oi oi-comment-square" aria-hidden="true"></span> Om in te vullen
             </NavLink>
         </div>
     </nav>

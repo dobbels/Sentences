@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor(); 
 builder.Services.AddSingleton<SentenceStemService>();
+builder.Services.AddSingleton<NotesService>();
 
 var app = builder.Build();
 
@@ -13,6 +14,13 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var sentenceStemService = services.GetRequiredService<SentenceStemService>();
+    await sentenceStemService.InitializeAsync();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var sentenceStemService = services.GetRequiredService<NotesService>();
     await sentenceStemService.InitializeAsync();
 }
 
