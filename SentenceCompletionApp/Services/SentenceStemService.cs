@@ -28,8 +28,11 @@ public class SentenceStemService
 
     public Task<SentenceStem> GetNextSentenceStemAsync()
     {
-        var currentStem = PillarsOfSelfEsteem30DayProgram.GetRandomSentence();
-        return Task.FromResult(currentStem.SentenceStem);
+        return Balancer.GetCurrentType switch
+        {
+            Balancer.SentenceType.SixPillarsProgram => Task.FromResult(PillarsOfSelfEsteem30DayProgram.GetRandomSentence().SentenceStem),
+            _ => Task.FromResult(PersoSentences.GetRandomSentence()),
+        };
     }
 
     public async Task PersistFormedSentenceAsync(SentenceSubmissionDto sentenceSubmissionDto)
@@ -46,5 +49,16 @@ public class SentenceStemService
         }
         
         await _container.CreateItemAsync(sentenceSubmission, new PartitionKey(sentenceSubmission.SentenceStemText));
+    }
+
+    private class Balancer
+    {
+        private int _count = 0;
+        public enum SentenceType
+        {
+            SixPillarsProgram,
+            Perso
+        };
+        public static SentenceType GetCurrentType => _count++ == 0 ? SentenceType.SixPillarsProgram : SentenceType.Perso;
     }
 }
