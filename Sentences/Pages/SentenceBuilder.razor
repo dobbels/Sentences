@@ -1,12 +1,8 @@
 ﻿@page "/"
 @page "/sentence-completion"
-@using SentenceCompletionApp.Model
-@using SentenceCompletionApp.Services
+@using Sentences.Model
+@using Sentences.Services
 @inject SentenceStemService SentenceStemService
-
-<PageTitle>Sentence Completion</PageTitle>
-
-<h3>Sentence Completion</h3>
 
 <div style="display: flex;">
     <div style="display:flex; align-items: center; padding-right: 1rem;">
@@ -44,6 +40,4 @@
         nextSentenceStem = await SentenceStemService.GetNextSentenceStemAsync();
         sentenceEnding = "";
     }
-
-
 }

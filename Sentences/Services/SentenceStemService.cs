@@ -1,8 +1,8 @@
 ﻿using Microsoft.Azure.Cosmos;
-using SentenceCompletionApp.Data;
-using SentenceCompletionApp.Model;
+using Sentences.Data;
+using Sentences.Model;
 
-namespace SentenceCompletionApp.Services;
+namespace Sentences.Services;
 
 public class SentenceStemService
 {
@@ -28,8 +28,11 @@ public class SentenceStemService
 
     public Task<SentenceStem> GetNextSentenceStemAsync()
     {
-        var currentStem = PillarsOfSelfEsteem30DayProgram.GetRandomSentence();
-        return Task.FromResult(currentStem.SentenceStem);
+        return Balancer.GetCurrentType switch
+        {
+            Balancer.SentenceType.SixPillarsProgram => Task.FromResult(PillarsOfSelfEsteem30DayProgram.GetRandomSentence().SentenceStem),
+            _ => Task.FromResult(PersoSentences.GetRandomSentence()),
+        };
     }
 
     public async Task PersistFormedSentenceAsync(SentenceSubmissionDto sentenceSubmissionDto)
@@ -44,7 +47,18 @@ public class SentenceStemService
         {
             throw new InvalidProgramException($"Container should have been initialized before calling the method {nameof(AddToContainerAsync)}");
         }
-        
+
         await _container.CreateItemAsync(sentenceSubmission, new PartitionKey(sentenceSubmission.SentenceStemText));
+    }
+
+    private class Balancer
+    {
+        private static int _count = 0;
+        public enum SentenceType
+        {
+            SixPillarsProgram,
+            Perso
+        };
+        public static SentenceType GetCurrentType => _count++ == 0 ? SentenceType.SixPillarsProgram : SentenceType.Perso;
     }
 }

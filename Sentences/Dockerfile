@@ -7,16 +7,16 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY ["SentenceCompletionApp/SentenceCompletionApp.csproj", "SentenceCompletionApp/"]
-RUN dotnet restore "SentenceCompletionApp/SentenceCompletionApp.csproj"
+COPY ["Sentences/Sentences.csproj", "Sentences/"]
+RUN dotnet restore "Sentences/Sentences.csproj"
 COPY . .
-WORKDIR "/src/SentenceCompletionApp"
-RUN dotnet build "SentenceCompletionApp.csproj" -c Release -o /app/build
+WORKDIR "/src/Sentences"
+RUN dotnet build "Sentences.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "SentenceCompletionApp.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Sentences.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "SentenceCompletionApp.dll"]
+ENTRYPOINT ["dotnet", "Sentences.dll"]

@@ -1,0 +1,33 @@
+﻿@page "/notes"
+@using Sentences.Model
+@using Sentences.Services
+@inject NotesService NotesService
+
+<div class="take-space notes">
+    <textarea class="take-space notes-text"
+              @bind="notes"
+              maxlength="80000"
+              placeholder="Waar denk je aan?"
+              required="required" pattern=".+" />
+    <button class="oi oi-arrow-thick-right submit-button" type="button" @onclick="SubmitNotes"></button>
+</div>
+
+@code {
+    private string notes = "";
+
+    private async Task SubmitNotes()
+    {
+        if (!String.IsNullOrWhiteSpace(notes))
+        {
+            await NotesService.PersistNotesAsync(notes);
+            GetReadyForNextInput();
+        }
+    }
+
+    private void GetReadyForNextInput()
+    {
+        notes = "";
+    }
+
+
+}
